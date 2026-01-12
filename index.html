@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Operation On-Time — Mission Control</title>
+  <style>
+    :root{
+      --bg1:#0b1022;
+      --bg2:#0b2a3a;
+      --bg3:#1a3b7a;
+      --card: rgba(255,255,255,.06);
+      --stroke: rgba(255,255,255,.12);
+      --text:#eaf0ff;
+      --muted:#b7c4ff;
+      --muted2:#9aa7c7;
+      --good1:#22d3ee;
+      --good2:#60a5fa;
+      --good3:#a78bfa;
+      --rest: rgba(255,255,255,.10);
+      --shadow: 0 30px 80px rgba(0,0,0,.45);
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color:var(--text);
+      background: radial-gradient(1200px 800px at 20% 10%, rgba(96,165,250,.35), transparent 60%),
+                  radial-gradient(900px 700px at 80% 20%, rgba(167,139,250,.25), transparent 55%),
+                  linear-gradient(135deg, var(--bg3), var(--bg2), var(--bg1));
+      min-height:100vh;
+      padding: 44px 18px;
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+    }
+    .wrap{
+      width: min(920px, 100%);
+      display:grid;
+      gap:14px;
+    }
+    .top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      padding: 18px 18px;
+      border-radius: 18px;
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+    .brand{
+      display:flex; align-items:center; gap:14px;
+    }
+    .logo{
+      width:54px; height:54px; border-radius:16px;
+      background: linear-gradient(135deg, rgba(34,211,238,.25), rgba(96,165,250,.25), rgba(167,139,250,.25));
+      border: 1px solid rgba(255,255,255,.14);
+      display:flex; align-items:center; justify-content:center;
+      font-weight:900; letter-spacing:.3px;
+    }
+    h1{ margin:0; font-size:20px; }
+    .sub{ margin-top:4px; color:var(--muted); font-size:13px; }
+    .pill{
+      font-size:12px;
+      padding:8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
+      color: var(--muted);
+      white-space:nowrap;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:14px;
+    }
+    @media (max-width: 860px){
+      .grid{ grid-template-columns:1fr; }
+    }
+    .card{
+      border-radius: 18px;
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      padding: 18px;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:10px;
+      margin-bottom: 14px;
+    }
+    @media (max-width: 520px){
+      .stats{ grid-template-columns:1fr; }
+    }
+    .stat{
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: linear-gradient(135deg, rgba(96,165,250,.12), rgba(167,139,250,.10));
+    }
+    .k{ color: var(--muted2); font-size: 12px; }
+    .v{ font-size: 18px; font-weight: 900; margin-top: 6px; }
+
+    .bar{
+      height: 16px;
+      border-radius:999px;
+      background: rgba(255,255,255,.12);
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.12);
+    }
+    .fill{
+      height:100%;
+      width:0%;
+      border-radius:999px;
+      background: linear-gradient(90deg, var(--good1), var(--good2), var(--good3));
+      transition: width .45s ease;
+      box-shadow: 0 10px 30px rgba(96,165,250,.35);
+    }
+    .status{
+      margin-top: 12px;
+      text-align:center;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: linear-gradient(135deg, rgba(34,211,238,.10), rgba(96,165,250,.10), rgba(167,139,250,.08));
+      font-weight: 700;
+      letter-spacing:.2px;
+    }
+
+    .calendar{
+      display:grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap:8px;
+      margin-top: 14px;
+    }
+    .day{
+      border-radius: 14px;
+      padding: 10px 8px;
+      text-align:center;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.16);
+      user-select:none;
+    }
+    .dow{ font-size:11px; color: var(--muted2); }
+    .num{ font-size:16px; font-weight: 900; margin-top:4px; }
+    .goalTag{
+      font-size:10px; margin-top:6px; color: var(--muted);
+      opacity:.9;
+    }
+    .restDay{
+      background: rgba(255,255,255,.06);
+      color: var(--muted2);
+      opacity:.72;
+    }
+    .checked{
+      background: linear-gradient(135deg, rgba(34,211,238,.95), rgba(96,165,250,.92), rgba(167,139,250,.90));
+      color: #07101a;
+      border-color: rgba(255,255,255,.18);
+      box-shadow: 0 14px 28px rgba(96,165,250,.25);
+    }
+    .today{
+      outline: 2px solid rgba(34,211,238,.55);
+      outline-offset: 2px;
+    }
+    .legend{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 12px;
+      justify-content:center;
+    }
+    .dot{ width:10px; height:10px; border-radius:999px; display:inline-block; margin-right:6px; }
+    .dot.checked{ background: linear-gradient(90deg, var(--good1), var(--good2), var(--good3)); }
+    .dot.goal{ background: rgba(255,255,255,.28); }
+    .dot.rest{ background: rgba(255,255,255,.10); }
+
+    .side h2{
+      margin: 0 0 10px 0;
+      font-size: 16px;
+    }
+    .note{
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .small{
+      margin-top: 10px;
+      color: var(--muted2);
+      font-size: 12px;
+      line-height:1.5;
+    }
+    .link{
+      display:inline-block;
+      margin-top:10px;
+      color: var(--muted);
+      text-decoration: none;
+      border-bottom: 1px dashed rgba(255,255,255,.25);
+    }
+    .link:hover{ opacity:.85; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">
+        <div class="logo">TCT</div>
+        <div>
+          <h1>Operation On-Time</h1>
+          <div class="sub">Mission Control · Shared progress dashboard</div>
+        </div>
+      </div>
+      <div class="pill" id="windowPill">Window: Jan 12 → …</div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="stats">
+          <div class="stat">
+            <div class="k">On-time days</div>
+            <div class="v" id="count">—</div>
+          </div>
+          <div class="stat">
+            <div class="k">Goal</div>
+            <div class="v">35</div>
+          </div>
+          <div class="stat">
+            <div class="k">Rest days</div>
+            <div class="v">Fri + Shabbat</div>
+          </div>
+        </div>
+
+        <div class="bar"><div class="fill" id="fill"></div></div>
+        <div class="status" id="status">Loading…</div>
+
+        <div class="calendar" id="cal"></div>
+
+        <div class="legend">
+          <span><span class="dot checked"></span>Completed</span>
+          <span><span class="dot goal"></span>Goal day</span>
+          <span><span class="dot rest"></span>Rest day</span>
+        </div>
+      </div>
+
+      <div class="card side">
+        <h2>How it works</h2>
+        <div class="note">
+          This public page is <b>read-only</b>. It shows the shared progress from <code>progress.json</code> in the repo.
+          <br/><br/>
+          You update progress from the admin page (same site):
+          <br/>
+          <a class="link" href="./admin.html">Open admin updater</a>
+        </div>
+        <div class="small">
+          Rules: Mission is 40 days starting <b>Jan 12</b>. Only <b>Sunday–Thursday</b> can be counted.
+          Friday & Shabbat are shown as rest days and don’t affect the goal.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const START_DATE = new Date("2026-01-12T00:00:00");
+    const TOTAL_DAYS = 40;
+    const GOAL = 35;
+
+    const calEl = document.getElementById("cal");
+    const countEl = document.getElementById("count");
+    const fillEl = document.getElementById("fill");
+    const statusEl = document.getElementById("status");
+    const windowPill = document.getElementById("windowPill");
+
+    function isGoalDay(d){
+      const day = d.getDay();
+      return day >= 0 && day <= 4; // Sun–Thu
+    }
+
+    function endDate(){
+      const e = new Date(START_DATE);
+      e.setDate(e.getDate() + TOTAL_DAYS - 1);
+      return e;
+    }
+
+    function fmt(d){
+      return d.toLocaleDateString("en-US", { month:"short", day:"numeric" });
+    }
+
+    function buildCalendar(checkedDays){
+      calEl.innerHTML = "";
+      const todayStr = new Date().toDateString();
+
+      for(let i=0;i<TOTAL_DAYS;i++){
+        const d = new Date(START_DATE);
+        d.setDate(d.getDate()+i);
+        const key = d.toDateString();
+
+        const div = document.createElement("div");
+        div.className = "day " + (isGoalDay(d) ? "" : "restDay");
+
+        if(key === todayStr) div.classList.add("today");
+        if(checkedDays.includes(key)) div.classList.add("checked");
+
+        div.innerHTML = `
+          <div class="dow">${d.toLocaleDateString("en-US",{weekday:"short"})}</div>
+          <div class="num">${d.getDate()}</div>
+          <div class="goalTag">${isGoalDay(d) ? "Goal day" : "Rest"}</div>
+        `;
+        calEl.appendChild(div);
+      }
+    }
+
+    async function load(){
+      const res = await fetch("./progress.json?t=" + Date.now(), { cache:"no-store" });
+      if(!res.ok) throw new Error("Cannot load progress.json");
+      const data = await res.json();
+      const checkedDays = Array.isArray(data.checkedDays) ? data.checkedDays : [];
+
+      countEl.textContent = `${checkedDays.length} / ${GOAL}`;
+      fillEl.style.width = `${Math.min(100, (checkedDays.length/GOAL)*100)}%`;
+
+      if(checkedDays.length >= GOAL) statusEl.textContent = "🏆 Mission complete";
+      else statusEl.textContent = "⚡ In progress — updates sync for all viewers";
+
+      buildCalendar(checkedDays);
+
+      const e = endDate();
+      windowPill.textContent = `Window: ${fmt(START_DATE)} → ${fmt(e)}`;
+    }
+
+    load().catch(err=>{
+      statusEl.textContent = "⚠️ Couldn’t load progress.";
+      console.error(err);
+    });
+  </script>
+</body>
+</html>
