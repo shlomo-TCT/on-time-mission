@@ -111,10 +111,10 @@
     /* ───────── GRID ───────── */
 
     .grid{
-      display:grid;
-      grid-template-columns:1.1fr .9fr;
-      gap:14px;
-    }
+  display:grid;
+  grid-template-columns: 1fr;
+  justify-items: center;
+}
 
     @media(max-width:860px){
       .grid{ grid-template-columns:1fr; }
@@ -128,6 +128,10 @@
       backdrop-filter:blur(10px);
       padding:18px;
     }
+    .card{
+  max-width: 720px;
+  width: 100%;
+}
 
     /* ───────── STATS ───────── */
 
@@ -189,6 +193,11 @@
       gap:8px;
       margin-top:14px;
     }
+    .week-head div{
+  text-align:center;
+  font-size:11px;
+  color:var(--muted2);
+}
 
     .day{
       border-radius:14px;
@@ -255,7 +264,11 @@
 
         <div class="bar"><div class="fill" id="fill"></div></div>
         <div class="status" id="status">Loading…</div>
-
+        
+<div class="calendar week-head">
+  <div>Sun</div><div>Mon</div><div>Tue</div>
+  <div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+</div>
         <div class="calendar" id="cal"></div>
       </div>
       
@@ -281,19 +294,40 @@
     }
 
     function build(checked){
-      cal.innerHTML="";
-      const today = new Date().toDateString();
+  cal.innerHTML = "";
 
-      for(let i=0;i<DAYS;i++){
-        const d=new Date(START); d.setDate(d.getDate()+i);
-        const key=d.toDateString();
-        const div=document.createElement("div");
-        div.className="day"+(isGoal(d)?"":" rest")+(key===today?" today":"")+(checked.includes(key)?" checked":"");
-        div.innerHTML=`<div class="dow">${d.toLocaleDateString("en",{weekday:"short"})}</div><div class="num">${d.getDate()}</div>`;
-        cal.appendChild(div);
-      }
-    }
+  // --- align calendar so week starts on Sunday ---
+  const firstDayOfWeek = START.getDay(); // 0 = Sunday
+  for(let i = 0; i < firstDayOfWeek; i++){
+    const spacer = document.createElement("div");
+    spacer.className = "day rest";
+    spacer.style.visibility = "hidden";
+    cal.appendChild(spacer);
+  }
 
+  const today = new Date().toDateString();
+
+  for(let i = 0; i < DAYS; i++){
+    const d = new Date(START);
+    d.setDate(d.getDate() + i);
+
+    const key = d.toISOString().slice(0,10);
+
+    const div = document.createElement("div");
+    div.className =
+      "day" +
+      (isGoal(d) ? "" : " rest") +
+      (checked.includes(key) ? " checked" : "") +
+      (d.toDateString() === today ? " today" : "");
+
+    div.innerHTML = `
+      <div class="dow">${d.toLocaleDateString("en-US",{ weekday:"short" })}</div>
+      <div class="num">${d.getDate()}</div>
+    `;
+
+    cal.appendChild(div);
+  }
+}
     async function load(){
       const r=await fetch("progress.json?t="+Date.now(),{cache:"no-store"});
       const j=await r.json();
