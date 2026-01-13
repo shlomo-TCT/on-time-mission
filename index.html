@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Operation On-Time — Mission Control</title>
+<title>Operation On-Time</title>
 
 <style>
 :root{
@@ -32,7 +32,7 @@ body{
     radial-gradient(900px 700px at 80% 20%, rgba(167,139,250,.25), transparent 55%),
     linear-gradient(135deg, var(--bg3), var(--bg2), var(--bg1));
   min-height:100vh;
-  padding:40px 16px;
+  padding:36px 16px;
   display:flex;
   justify-content:center;
 }
@@ -44,22 +44,20 @@ body{
   gap:14px;
 }
 
-/* HEADER */
+/* ───── HEADER ───── */
 .top{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:18px;
+  padding:16px;
   border-radius:18px;
   background:var(--card);
   border:1px solid var(--stroke);
   box-shadow:var(--shadow);
+  text-align:center;
 }
 
-.brand{ display:flex; gap:14px; align-items:center; }
-
 .logo{
-  width:54px;height:54px;border-radius:16px;
+  width:52px;height:52px;
+  margin:0 auto 8px;
+  border-radius:14px;
   background:linear-gradient(135deg, rgba(34,211,238,.25), rgba(96,165,250,.25), rgba(167,139,250,.25));
   display:flex;align-items:center;justify-content:center;
 }
@@ -70,13 +68,17 @@ h1{ margin:0;font-size:20px; }
 .sub{ font-size:13px;color:var(--muted);margin-top:4px; }
 
 .pill{
-  font-size:12px;padding:8px 10px;border-radius:999px;
+  display:inline-block;
+  margin-top:10px;
+  font-size:12px;
+  padding:6px 12px;
+  border-radius:999px;
   border:1px solid rgba(255,255,255,.14);
   background:rgba(0,0,0,.18);
   color:var(--muted);
 }
 
-/* CARD */
+/* ───── CARD ───── */
 .card{
   padding:18px;
   border-radius:18px;
@@ -85,27 +87,32 @@ h1{ margin:0;font-size:20px; }
   box-shadow:var(--shadow);
 }
 
-/* STATS */
+/* ───── STATS ───── */
 .stats{
   display:grid;
-  grid-template-columns:repeat(3,1fr);
+  grid-template-columns:repeat(4,1fr);
   gap:10px;
   margin-bottom:14px;
 }
 
+@media(max-width:640px){
+  .stats{ grid-template-columns:repeat(2,1fr); }
+}
+
 .stat{
-  padding:12px;
+  padding:10px;
   border-radius:14px;
   border:1px solid rgba(255,255,255,.12);
   background:linear-gradient(135deg, rgba(96,165,250,.12), rgba(167,139,250,.10));
+  text-align:center;
 }
 
-.k{ font-size:12px;color:var(--muted2); }
-.v{ font-size:18px;font-weight:900;margin-top:6px; }
+.k{ font-size:11px;color:var(--muted2); }
+.v{ font-size:17px;font-weight:900;margin-top:4px; }
 
-/* PROGRESS */
+/* ───── PROGRESS ───── */
 .bar{
-  height:16px;border-radius:999px;
+  height:14px;border-radius:999px;
   background:rgba(255,255,255,.12);
   overflow:hidden;border:1px solid rgba(255,255,255,.12);
 }
@@ -117,7 +124,7 @@ h1{ margin:0;font-size:20px; }
 }
 
 .status{
-  margin-top:12px;
+  margin-top:10px;
   padding:10px;
   text-align:center;
   border-radius:14px;
@@ -126,14 +133,7 @@ h1{ margin:0;font-size:20px; }
   font-weight:700;
 }
 
-.buffer{
-  margin-top:6px;
-  text-align:center;
-  font-size:13px;
-  color:var(--muted);
-}
-
-/* CALENDAR */
+/* ───── CALENDAR ───── */
 .week-head{
   display:grid;
   grid-template-columns:repeat(7,1fr);
@@ -180,26 +180,22 @@ h1{ margin:0;font-size:20px; }
 <div class="wrap">
 
 <div class="top">
-  <div class="brand">
-    <div class="logo"><img src="logo.png"></div>
-    <div>
-      <h1>Operation On-Time</h1>
-      <div class="sub">Mission Control · Shared progress</div>
-    </div>
-  </div>
+  <div class="logo"><img src="logo.png"></div>
+  <h1>Operation On-Time</h1>
+  <div class="sub">Mission Control · Shared progress</div>
   <div class="pill" id="window"></div>
 </div>
 
 <div class="card">
   <div class="stats">
-    <div class="stat"><div class="k">On-time days</div><div class="v" id="count"></div></div>
-    <div class="stat"><div class="k">Goal</div><div class="v">35</div></div>
+    <div class="stat"><div class="k">On-time</div><div class="v" id="count"></div></div>
+    <div class="stat"><div class="k">Mission length</div><div class="v">40 days</div></div>
+    <div class="stat"><div class="k">Buffer left</div><div class="v" id="buffer"></div></div>
     <div class="stat"><div class="k">Rest days</div><div class="v">Fri + Shabbat</div></div>
   </div>
 
   <div class="bar"><div class="fill" id="fill"></div></div>
-  <div class="status" id="status"></div>
-  <div class="buffer" id="buffer"></div>
+  <div class="status" id="status">⚡ In progress</div>
 
   <div class="week-head">
     <div>Sun</div><div>Mon</div><div>Tue</div>
@@ -219,8 +215,7 @@ const GOAL = 35;
 const cal = document.getElementById("cal");
 const count = document.getElementById("count");
 const fill = document.getElementById("fill");
-const status = document.getElementById("status");
-const buffer = document.getElementById("buffer");
+const bufferEl = document.getElementById("buffer");
 const windowPill = document.getElementById("window");
 
 function endDate(){
@@ -263,17 +258,16 @@ async function load(){
 
   count.textContent=`${checked.length} / ${GOAL}`;
   fill.style.width=Math.min(100,(checked.length/GOAL)*100)+"%";
-  status.textContent="⚡ In progress";
 
   const daysElapsed=Math.min(DAYS,
     Math.floor((Date.now()-START)/(1000*60*60*24))+1
   );
   const bufferLeft=Math.max(0,(DAYS-GOAL)-(daysElapsed-checked.length));
-  buffer.textContent=`Buffer remaining: ${bufferLeft} days`;
+  bufferEl.textContent=bufferLeft;
 
   build(checked);
   const e=endDate();
-  windowPill.textContent=`Window: ${START.toLocaleDateString()} → ${e.toLocaleDateString()}`;
+  windowPill.textContent=`40-Day Mission · ${START.toLocaleDateString()} – ${e.toLocaleDateString()}`;
 }
 
 load();
