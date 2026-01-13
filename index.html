@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Operation On-Time</title>
+<title>On-Time Progress</title>
 
 <style>
 :root{
@@ -25,7 +25,7 @@
 
 body{
   margin:0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto;
   color:var(--text);
   background:
     radial-gradient(1200px 800px at 20% 10%, rgba(96,165,250,.35), transparent 60%),
@@ -40,32 +40,34 @@ body{
 .wrap{
   width:100%;
   max-width:720px;
-  display:grid;
-  gap:14px;
 }
 
-/* ───── HEADER (COMPACT) ───── */
-.top{
-  padding:12px 16px;
+/* ───── SINGLE CARD ───── */
+.card{
+  padding:18px;
   border-radius:18px;
   background:var(--card);
   border:1px solid var(--stroke);
   box-shadow:var(--shadow);
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:14px;
 }
 
-.top-left{
+/* ───── HEADER ROW ───── */
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:14px;
+}
+
+.title{
   display:flex;
   align-items:center;
-  gap:12px;
+  gap:10px;
 }
 
 .logo{
-  width:40px;
-  height:40px;
+  width:38px;
+  height:38px;
   border-radius:12px;
   background:linear-gradient(135deg, rgba(34,211,238,.25), rgba(96,165,250,.25), rgba(167,139,250,.25));
   display:flex;
@@ -82,32 +84,21 @@ body{
 
 h1{
   margin:0;
-  font-size:18px;
+  font-size:17px;
 }
 
 .sub{
   font-size:12px;
   color:var(--muted);
-  margin-top:2px;
 }
 
-.pill{
+.dates{
   font-size:12px;
-  padding:6px 12px;
+  color:var(--muted);
+  padding:6px 10px;
   border-radius:999px;
   border:1px solid rgba(255,255,255,.14);
   background:rgba(0,0,0,.18);
-  color:var(--muted);
-  white-space:nowrap;
-}
-
-/* ───── CARD ───── */
-.card{
-  padding:18px;
-  border-radius:18px;
-  background:var(--card);
-  border:1px solid var(--stroke);
-  box-shadow:var(--shadow);
 }
 
 /* ───── STATS ───── */
@@ -130,16 +121,8 @@ h1{
   text-align:center;
 }
 
-.k{
-  font-size:11px;
-  color:var(--muted2);
-}
-
-.v{
-  font-size:17px;
-  font-weight:900;
-  margin-top:4px;
-}
+.k{ font-size:11px; color:var(--muted2); }
+.v{ font-size:16px; font-weight:900; margin-top:4px; }
 
 /* ───── PROGRESS ───── */
 .bar{
@@ -196,7 +179,7 @@ h1{
   font-weight:800;
 }
 
-.rest{ opacity:.5; }
+.rest{ opacity:.45; }
 
 .checked{
   background:linear-gradient(135deg, rgba(34,211,238,.95), rgba(96,165,250,.92));
@@ -213,50 +196,41 @@ h1{
 <body>
 <div class="wrap">
 
-<!-- HEADER -->
-<div class="top">
-  <div class="top-left">
-    <div class="logo"><img src="logo.png" alt=""></div>
-    <div>
-      <h1>Operation On-Time</h1>
-      <div class="sub">Here you can see my progress toward my goal</div>
-    </div>
-  </div>
-  <div class="pill" id="window"></div>
-</div>
-
-<!-- MAIN CARD -->
 <div class="card">
-  <div class="stats">
-    <div class="stat">
-      <div class="k">On-time days</div>
-      <div class="v" id="count"></div>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="title">
+      <div class="logo"><img src="logo.png"></div>
+      <div>
+        <h1>On-Time Goal</h1>
+        <div class="sub">Here you can see my progress toward my goal</div>
+      </div>
     </div>
-    <div class="stat">
-      <div class="k">Mission length</div>
-      <div class="v">40 days</div>
-    </div>
-    <div class="stat">
-      <div class="k">Buffer remaining</div>
-      <div class="v" id="buffer"></div>
-    </div>
-    <div class="stat">
-      <div class="k">Rest days</div>
-      <div class="v">Fri + Shabbat</div>
-    </div>
+    <div class="dates" id="window"></div>
   </div>
 
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat"><div class="k">On-time days</div><div class="v" id="count"></div></div>
+    <div class="stat"><div class="k">Mission length</div><div class="v">40 days</div></div>
+    <div class="stat"><div class="k">Buffer remaining</div><div class="v" id="buffer"></div></div>
+    <div class="stat"><div class="k">Rest days</div><div class="v">Fri + Shabbat</div></div>
+  </div>
+
+  <!-- PROGRESS -->
   <div class="bar"><div class="fill" id="fill"></div></div>
   <div class="status">⚡ In progress</div>
 
+  <!-- CALENDAR -->
   <div class="week-head">
     <div>Sun</div><div>Mon</div><div>Tue</div>
     <div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
   </div>
 
   <div class="calendar" id="cal"></div>
-</div>
 
+</div>
 </div>
 
 <script>
@@ -268,7 +242,7 @@ const cal = document.getElementById("cal");
 const count = document.getElementById("count");
 const fill = document.getElementById("fill");
 const bufferEl = document.getElementById("buffer");
-const windowPill = document.getElementById("window");
+const windowEl = document.getElementById("window");
 
 function endDate(){
   const e = new Date(START);
@@ -278,7 +252,7 @@ function endDate(){
 
 function build(checked){
   cal.innerHTML="";
-  const offset = START.getDay(); // Sunday = 0
+  const offset = START.getDay();
   for(let i=0;i<offset;i++){
     const s=document.createElement("div");
     s.style.visibility="hidden";
@@ -316,14 +290,12 @@ async function load(){
     DAYS,
     Math.floor((Date.now() - START) / (1000*60*60*24)) + 1
   );
-
-  const bufferLeft = Math.max(0,(DAYS - GOAL) - (daysElapsed - checked.length));
-  bufferEl.textContent = bufferLeft;
+  bufferEl.textContent = Math.max(0,(DAYS-GOAL)-(daysElapsed-checked.length));
 
   build(checked);
 
-  const e = endDate();
-  windowPill.textContent =
+  const e=endDate();
+  windowEl.textContent =
     `${START.toLocaleDateString()} – ${e.toLocaleDateString()}`;
 }
 
@@ -331,4 +303,3 @@ load();
 </script>
 </body>
 </html>
-
