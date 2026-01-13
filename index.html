@@ -32,7 +32,7 @@ body{
     radial-gradient(900px 700px at 80% 20%, rgba(167,139,250,.25), transparent 55%),
     linear-gradient(135deg, var(--bg3), var(--bg2), var(--bg1));
   min-height:100vh;
-  padding:36px 16px;
+  padding:32px 16px;
   display:flex;
   justify-content:center;
 }
@@ -44,38 +44,61 @@ body{
   gap:14px;
 }
 
-/* ───── HEADER ───── */
+/* ───── HEADER (COMPACT) ───── */
 .top{
-  padding:16px;
+  padding:12px 16px;
   border-radius:18px;
   background:var(--card);
   border:1px solid var(--stroke);
   box-shadow:var(--shadow);
-  text-align:center;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+}
+
+.top-left{
+  display:flex;
+  align-items:center;
+  gap:12px;
 }
 
 .logo{
-  width:52px;height:52px;
-  margin:0 auto 8px;
-  border-radius:14px;
+  width:40px;
+  height:40px;
+  border-radius:12px;
   background:linear-gradient(135deg, rgba(34,211,238,.25), rgba(96,165,250,.25), rgba(167,139,250,.25));
-  display:flex;align-items:center;justify-content:center;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 
-.logo img{ width:100%;height:100%;object-fit:contain;padding:6px; }
+.logo img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  padding:4px;
+}
 
-h1{ margin:0;font-size:20px; }
-.sub{ font-size:13px;color:var(--muted);margin-top:4px; }
+h1{
+  margin:0;
+  font-size:18px;
+}
+
+.sub{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:2px;
+}
 
 .pill{
-  display:inline-block;
-  margin-top:10px;
   font-size:12px;
   padding:6px 12px;
   border-radius:999px;
   border:1px solid rgba(255,255,255,.14);
   background:rgba(0,0,0,.18);
   color:var(--muted);
+  white-space:nowrap;
 }
 
 /* ───── CARD ───── */
@@ -107,18 +130,29 @@ h1{ margin:0;font-size:20px; }
   text-align:center;
 }
 
-.k{ font-size:11px;color:var(--muted2); }
-.v{ font-size:17px;font-weight:900;margin-top:4px; }
+.k{
+  font-size:11px;
+  color:var(--muted2);
+}
+
+.v{
+  font-size:17px;
+  font-weight:900;
+  margin-top:4px;
+}
 
 /* ───── PROGRESS ───── */
 .bar{
-  height:14px;border-radius:999px;
+  height:14px;
+  border-radius:999px;
   background:rgba(255,255,255,.12);
-  overflow:hidden;border:1px solid rgba(255,255,255,.12);
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.12);
 }
 
 .fill{
-  height:100%;width:0%;
+  height:100%;
+  width:0%;
   background:linear-gradient(90deg,var(--g1),var(--g2),var(--g3));
   transition:width .4s ease;
 }
@@ -179,23 +213,41 @@ h1{ margin:0;font-size:20px; }
 <body>
 <div class="wrap">
 
+<!-- HEADER -->
 <div class="top">
-  <div class="logo"><img src="logo.png"></div>
-  <h1>Operation On-Time</h1>
-  <div class="sub">Mission Control · Shared progress</div>
+  <div class="top-left">
+    <div class="logo"><img src="logo.png" alt=""></div>
+    <div>
+      <h1>Operation On-Time</h1>
+      <div class="sub">Here you can see my progress toward my goal</div>
+    </div>
+  </div>
   <div class="pill" id="window"></div>
 </div>
 
+<!-- MAIN CARD -->
 <div class="card">
   <div class="stats">
-    <div class="stat"><div class="k">On-time</div><div class="v" id="count"></div></div>
-    <div class="stat"><div class="k">Mission length</div><div class="v">40 days</div></div>
-    <div class="stat"><div class="k">Buffer left</div><div class="v" id="buffer"></div></div>
-    <div class="stat"><div class="k">Rest days</div><div class="v">Fri + Shabbat</div></div>
+    <div class="stat">
+      <div class="k">On-time days</div>
+      <div class="v" id="count"></div>
+    </div>
+    <div class="stat">
+      <div class="k">Mission length</div>
+      <div class="v">40 days</div>
+    </div>
+    <div class="stat">
+      <div class="k">Buffer remaining</div>
+      <div class="v" id="buffer"></div>
+    </div>
+    <div class="stat">
+      <div class="k">Rest days</div>
+      <div class="v">Fri + Shabbat</div>
+    </div>
   </div>
 
   <div class="bar"><div class="fill" id="fill"></div></div>
-  <div class="status" id="status">⚡ In progress</div>
+  <div class="status">⚡ In progress</div>
 
   <div class="week-head">
     <div>Sun</div><div>Mon</div><div>Tue</div>
@@ -226,7 +278,7 @@ function endDate(){
 
 function build(checked){
   cal.innerHTML="";
-  const offset = START.getDay();
+  const offset = START.getDay(); // Sunday = 0
   for(let i=0;i<offset;i++){
     const s=document.createElement("div");
     s.style.visibility="hidden";
@@ -241,10 +293,11 @@ function build(checked){
     const key=d.toISOString().slice(0,10);
 
     const div=document.createElement("div");
-    div.className="day"+
-      (checked.includes(key)?" checked":"")+
-      (key===todayKey?" today":"")+
-      ((d.getDay()==5||d.getDay()==6)?" rest":"");
+    div.className =
+      "day" +
+      (checked.includes(key) ? " checked" : "") +
+      (key === todayKey ? " today" : "") +
+      ((d.getDay()===5 || d.getDay()===6) ? " rest" : "");
 
     div.textContent=d.getDate();
     cal.appendChild(div);
@@ -252,25 +305,30 @@ function build(checked){
 }
 
 async function load(){
-  const r=await fetch("progress.json?t="+Date.now());
-  const j=await r.json();
-  const checked=j.checkedDays||[];
+  const r = await fetch("progress.json?t="+Date.now());
+  const j = await r.json();
+  const checked = j.checkedDays || [];
 
-  count.textContent=`${checked.length} / ${GOAL}`;
-  fill.style.width=Math.min(100,(checked.length/GOAL)*100)+"%";
+  count.textContent = `${checked.length} / ${GOAL}`;
+  fill.style.width = Math.min(100,(checked.length/GOAL)*100) + "%";
 
-  const daysElapsed=Math.min(DAYS,
-    Math.floor((Date.now()-START)/(1000*60*60*24))+1
+  const daysElapsed = Math.min(
+    DAYS,
+    Math.floor((Date.now() - START) / (1000*60*60*24)) + 1
   );
-  const bufferLeft=Math.max(0,(DAYS-GOAL)-(daysElapsed-checked.length));
-  bufferEl.textContent=bufferLeft;
+
+  const bufferLeft = Math.max(0,(DAYS - GOAL) - (daysElapsed - checked.length));
+  bufferEl.textContent = bufferLeft;
 
   build(checked);
-  const e=endDate();
-  windowPill.textContent=`40-Day Mission · ${START.toLocaleDateString()} – ${e.toLocaleDateString()}`;
+
+  const e = endDate();
+  windowPill.textContent =
+    `${START.toLocaleDateString()} – ${e.toLocaleDateString()}`;
 }
 
 load();
 </script>
 </body>
 </html>
+
