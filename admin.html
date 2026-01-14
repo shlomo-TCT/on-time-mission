@@ -76,7 +76,6 @@
     }
     .danger{ color: #fecaca; }
     .ok{ color: #bbf7d0; }
-    a{ color: var(--muted); }
     code{ color:#e2e8f0; }
   </style>
 </head>
@@ -140,6 +139,37 @@
       return d >= START_DATE && d <= end;
     }
 
+    // ✅ ISO key required by your main dashboard (YYYY-MM-DD)
+    function isoKey(d){
+      return new Date(d).toISOString().slice(0,10);
+    }
+
+    // ✅ auto-fix old bad formats like "Wed Jan 14 2026"
+    function normalizeDays(arr){
+      if(!Array.isArray(arr)) return [];
+
+      const out = [];
+
+      for(const item of arr){
+        if(typeof item !== "string") continue;
+
+        // Already ISO? keep it
+        if(/^\d{4}-\d{2}-\d{2}$/.test(item.trim())){
+          out.push(item.trim());
+          continue;
+        }
+
+        // Try parse anything else into a real date
+        const parsed = new Date(item);
+        if(!isNaN(parsed.getTime())){
+          out.push(isoKey(parsed));
+        }
+      }
+
+      // de-duplicate + sort
+      return Array.from(new Set(out)).sort();
+    }
+
     async function ghGet(owner, repo){
       const url = `https://api.github.com/repos/${owner}/${repo}/contents/progress.json`;
       const res = await fetch(url, { headers: { "Accept":"application/vnd.github+json" }});
@@ -158,7 +188,7 @@
     async function ghPut(owner, repo, token, obj, sha){
       const url = `https://api.github.com/repos/${owner}/${repo}/contents/progress.json`;
       const body = {
-        message: `Update progress (${new Date().toISOString().slice(0,10)})`,
+        message: `Update progress (${isoKey(new Date())})`,
         content: encodeContent(obj),
         sha
       };
@@ -189,7 +219,9 @@
       say("Loading current progress…");
       const file = await ghGet(owner, repo);
       const data = decodeContent(file.content);
-      const checkedDays = Array.isArray(data.checkedDays) ? data.checkedDays : [];
+
+      const checkedDays = normalizeDays(data.checkedDays);
+
       say(`Loaded. Completed days: ${checkedDays.length}`, "ok");
       return { file, data: { checkedDays } };
     }
@@ -210,16 +242,20 @@
         localStorage.setItem("ot_repo", repo);
 
         const today = new Date();
+
         if(!inWindow(today)) return say("Today is outside the 40-day window. Not marking.", "danger");
         if(!isGoalDay(today)) return say("Today is a REST day (Fri/Shabbat). Not marking.", "danger");
 
         say("Reading progress.json…");
         const { file, data } = await reload();
 
-        const key = today.toDateString();
+        const key = isoKey(today); // ✅ FIXED FORMAT
         if(data.checkedDays.includes(key)) return say("Already marked today ✅", "ok");
 
         data.checkedDays.push(key);
+
+        // normalize again (dedupe/sort) before writing back
+        data.checkedDays = normalizeDays(data.checkedDays);
 
         say("Committing update to GitHub…");
         await ghPut(owner, repo, token, data, file.sha);
