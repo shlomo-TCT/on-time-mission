@@ -289,8 +289,15 @@ async function load(){
 
   const daysElapsed =
     Math.floor((Date.now() - START) / (1000*60*60*24)) + 1;
-  bufferEl.textContent =
-    Math.max(0,(DAYS-GOAL)-(daysElapsed-checked.length));
+const bufferMax = DAYS - GOAL;
+
+const bufferLeft = Math.max(
+  0,
+  bufferMax - (daysElapsed - checked.length)
+);
+
+// ✅ cap it so it can NEVER show above 5
+bufferEl.textContent = Math.min(bufferMax, bufferLeft);
 
   build(checked);
 
